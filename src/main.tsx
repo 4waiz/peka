@@ -5,7 +5,6 @@ import '@fontsource/jetbrains-mono/600.css';
 import './styles/global.css';
 import './styles/panels.css';
 import './styles/twin.css';
-import './styles/story.css';
 import App from './App';
 import { useAppStore } from './store/useAppStore';
 

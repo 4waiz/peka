@@ -8,7 +8,6 @@ import { generateCity } from './CityGenerator';
 import { Buildings } from './BuildingGenerator';
 import { RoadNetwork } from './RoadNetwork';
 import { RoadTiles } from './RoadTiles';
-import { UndergroundView } from './UndergroundView';
 import { Waterway } from './Waterway';
 import { GroundCutaway } from './GroundCutaway';
 import { UtilityNetwork, type PipeSegment } from './UtilityNetwork';
@@ -74,7 +73,6 @@ export interface SimInputs {
   resolved: boolean;
   forecastHours: number;
   b12Risk: RiskLevel;
-  confidence: number;
 }
 
 export interface DemoInputs {
@@ -87,7 +85,7 @@ export interface DemoInputs {
 }
 
 export const PRESETS: Record<PresetName, CamPose> = {
-  overview: { target: [-12, 2, 4], radius: 205, polar: 57, azimuth: 12, fov: 36 },
+  overview: { target: [-22, -8, 52], radius: 128, polar: 70, azimuth: 8, fov: 38 },
   intro: { target: [-4, 2, -6], radius: 265, polar: 52, azimuth: -16, fov: 36 },
   city: { target: [0, 6, -20], radius: 245, polar: 47, azimuth: 20, fov: 36 },
   underground: { target: [-22, -13, 72.5], radius: 60, polar: 81, azimuth: 17, fov: 40 },
@@ -96,7 +94,7 @@ export const PRESETS: Record<PresetName, CamPose> = {
   asset: { target: [-8, -8, 6], radius: 185, polar: 54, azimuth: -26, fov: 36 },
   impact: { target: [-4, 2, 20], radius: 172, polar: 50, azimuth: 24, fov: 36 },
   b12: { target: [-20, 0, 34], radius: 118, polar: 54, azimuth: 12, fov: 36 },
-  final: { target: [-12, 2, 4], radius: 215, polar: 56, azimuth: 6, fov: 36 },
+  final: { target: [-12, -2, 12], radius: 215, polar: 57, azimuth: 4, fov: 36 },
 };
 
 const UTIL_ICON: Record<UtilityId, string> = {
@@ -176,7 +174,7 @@ export class TwinEngine {
     selectedSector: null,
     routeVisible: false,
   };
-  private sim: SimInputs = { leakSeverity: 0, detected: false, resolved: false, forecastHours: 0, b12Risk: 'low', confidence: 0 };
+  private sim: SimInputs = { leakSeverity: 0, detected: false, resolved: false, forecastHours: 0, b12Risk: 'low' };
   private demo: DemoInputs = { cutaway: false, correlation: false, localize: false, impact: false, emphasizeWater: false, blast: false };
   private cur = { surface: 1, buildings: 1, boost: 1, xray: 0, alert: 0, impactB: 0 };
 
@@ -341,9 +339,6 @@ export class TwinEngine {
 
   setSim(s: SimInputs) {
     const prevRisk = this.sim.b12Risk;
-    if (s.confidence !== this.sim.confidence) {
-      this.labels.setHTML('leakpin', `<span class="tl-pin"><i>!</i><b>Water leak</b><em>${Math.max(60, s.confidence)}%</em></span>`);
-    }
     this.sim = s;
     this.leak.setSeverity(s.leakSeverity);
     this.leak.setAlert(s.detected && !s.resolved);
@@ -458,30 +453,6 @@ export class TwinEngine {
     this.cam.setAutoOrbit(on, speed);
   }
 
-  private ug: UndergroundView | null = null;
-
-  /** Mount the second live view (underground close-up) into `container`. */
-  attachUnderground(container: HTMLElement) {
-    this.detachUnderground();
-    this.ug = new UndergroundView(container, this.scene, new THREE.Vector3(...LEAK.crack));
-    this.ug.compile().catch(() => undefined);
-    return this.ug;
-  }
-
-  detachUnderground() {
-    this.ug?.dispose();
-    this.ug = null;
-  }
-
-  get underground() {
-    return this.ug;
-  }
-
-  /** Fly the main camera to an arbitrary point of interest. */
-  focusPoint(x: number, y: number, z: number, radius = 30) {
-    return this.cam.flyTo({ target: [x, y, z], radius, polar: 74, azimuth: 16, fov: 40 }, 2.2);
-  }
-
   private additiveMats: THREE.Material[] | null = null;
 
   /**
@@ -556,7 +527,6 @@ export class TwinEngine {
     el.removeEventListener('pointerup', this.onPointerUp);
     el.removeEventListener('pointerleave', this.onPointerLeave);
     el.removeEventListener('dblclick', this.onDblClick);
-    this.detachUnderground();
     this.cam.dispose();
     this.labels.dispose();
     this.lighting.dispose();
@@ -634,10 +604,6 @@ export class TwinEngine {
       L.add(`node-${n.id}`, `<span class="tl-node">${n.id}</span>`, this.impact.anchors[n.id], { className: 'anchor-bottom', visible: false });
     }
     L.add('crew', '<span class="tl-crew">CREW W-3</span>', new THREE.Vector3(), { className: 'anchor-bottom', visible: false });
-    L.add('leakpin', '<span class="tl-pin"><i>!</i><b>Water leak</b><em>93%</em></span>', this.leak.beaconTop.clone().add(new THREE.Vector3(0, 1.2, 0)), {
-      className: 'anchor-pin',
-      visible: false,
-    });
     L.add(
       'leaktag',
       `<span class="tl-leak"><b>${LEAK.assetId}</b><em>Ø900 mm · depth 3.2 m · ductile iron</em></span>`,
@@ -680,7 +646,6 @@ export class TwinEngine {
     this.time += dt;
     this.update(dt);
     this.composer.render(dt);
-    this.ug?.render(dt, this.time);
     this.adapt(dt);
   };
 
@@ -815,7 +780,6 @@ export class TwinEngine {
       L.setHTML('crew', `<span class="tl-crew">CREW W-3 · ${this.vehicles.crewProgress >= 1 ? 'ON SITE' : 'EN ROUTE'}</span>`);
     }
     L.setVisible('leaktag', active && this.vis.layers.water);
-    L.setVisible('leakpin', active && v.view !== 'map');
     for (const sct of SECTORS) L.setVisible(`sector-${sct.id}`, c.surface > 0.4 || v.view === 'map');
     L.update(this.camera, this.width, this.height);
 

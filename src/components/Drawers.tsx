@@ -4,10 +4,6 @@ import { selDetected, useAppStore, type NavKey } from '../store/useAppStore';
 import { focusLeak, selectSector, setNav } from '../store/actions';
 import { SECTORS, UTILITIES, UTILITY_ORDER, type UtilityId } from '../simulation/infrastructureData';
 import { Sparkline } from './Sparkline';
-import { PredictionTimeline } from './PredictionTimeline';
-import { RiskGauge } from './RiskGauge';
-import { ServiceImpact } from './ServiceImpact';
-import { RiskMap } from './RiskMap';
 import { formatReading, type SensorKey } from '../simulation/sensorEngine';
 import { riskLevel } from '../simulation/riskEngine';
 
@@ -45,7 +41,7 @@ function AnalyticsDrawer() {
     { key: 'temperature', label: 'Temperature', color: '#9c67ff', span: 1.5 },
   ];
   return (
-    <Drawer nav="analytics" title="Network Analytics" sub="Prediction, risk, sector health and telemetry — the full detail">
+    <Drawer nav="analytics" title="Network Analytics" sub="Sector health, utility status and telemetry trends">
       <div className="kpis">
         <div className="kpi">
           <b>342</b>
@@ -63,23 +59,6 @@ function AnalyticsDrawer() {
           <b>{b12 ? '96.1' : '97.6'}%</b>
           <span>Network health</span>
         </div>
-      </div>
-
-      <div className="d-section">Failure prediction</div>
-      <div className="d-chart">
-        <PredictionTimeline />
-      </div>
-
-      <div className="d-duo">
-        <div className="d-gauge">
-          <RiskGauge />
-        </div>
-        <ServiceImpact />
-      </div>
-
-      <div className="d-section">Location &amp; risk</div>
-      <div className="d-map">
-        <RiskMap />
       </div>
 
       <div className="d-section">Sector health</div>

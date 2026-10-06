@@ -15,11 +15,16 @@ sensor feed are generated procedurally / simulated locally.
 
 ## Presenting
 
-Press **Run AI simulation** (or `Space`) for the 45-second guided story:
+Press **Run AI Simulation** (or `Space`) for the 45-second guided story:
 healthy city → sensor anomaly → AI correlation → leak localised in Sector B-12 →
 streets break open to reveal the pipes → leak reveal → failure forecast →
 impact on hospital, school and residents → prioritisation → repair plan and
 crew dispatch. The UI scales to fit any screen; `F` toggles fullscreen.
+
+The screen reads left to right: live sensor status and the AI summary, the 3D
+twin with the alert and camera/layer controls, then the repair plan and risk
+map. The bottom row follows the pipeline: workflow, failure timeline, risk
+score and affected services.
 
 | Key | Action |
 | --- | --- |
@@ -38,7 +43,7 @@ to inspect, double-click a pipe to follow it underground.
 - `src/three/` — Three.js twin: procedural city, cut-away ground, utility
   network with flow shaders, leak simulation, road slabs, camera, overlays
 - `src/simulation/` — sensor engine, risk scoring, scripted demo, world data
-- `src/components/` — React UI (story column, drawers, overlays)
+- `src/components/` — React UI (sidebars, bottom row, drawers, overlays)
 - `src/store/` — Zustand store and actions bridging UI and the 3D engine
 
 Risk weights and model outputs are illustrative prototype values, not a

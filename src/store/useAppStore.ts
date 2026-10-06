@@ -62,9 +62,9 @@ export type Theme = 'night' | 'day';
 
 function initialTheme(): Theme {
   try {
-    return localStorage.getItem('peka-theme') === 'night' ? 'night' : 'day';
+    return localStorage.getItem('peka-theme') === 'day' ? 'day' : 'night';
   } catch {
-    return 'day';
+    return 'night';
   }
 }
 

@@ -27,7 +27,6 @@ function simOf(s: AppState): SimInputs {
     resolved: s.repair.status === 'resolved',
     forecastHours: s.forecastHours,
     b12Risk: s.repair.status === 'resolved' ? 'low' : detected || s.demo.flags.localize ? riskLevel(Math.max(s.risk, s.demo.flags.localize ? 80 : 0)) : riskLevel(Math.min(s.risk, 45)),
-    confidence: s.confidence,
   };
 }
 
