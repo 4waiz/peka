@@ -7,6 +7,12 @@
       "runtimeArgs": ["run", "dev"],
       "port": 5173,
       "autoPort": true
+    },
+    {
+      "name": "qoder-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "C:\\Users\\awaiz\\OneDrive\\Desktop\\Git\\qoder-hackathon", "--", "--port", "5191", "--strictPort"],
+      "port": 5191
     }
   ]
 }
