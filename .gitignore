@@ -4,3 +4,12 @@ dist
 .vite
 .DS_Store
 npm-debug.log*
+
+# Environment files and secrets: never commit real keys
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+*.pem
+*.key
